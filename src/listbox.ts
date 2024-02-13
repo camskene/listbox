@@ -1,17 +1,24 @@
 import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 @customElement('cs-listbox')
 export class Listbox extends LitElement {
-  @property({ type: Number })
+  @state()
   activeIndex = -1;
 
-  @property({ type: Array })
+  @property()
   options = [];
 
   @property()
+  optionTemplate = (option: unknown) => html`${option}`;
+
+  @property()
   selected = this.options[this.activeIndex];
+
+  isSelected(index: number) {
+    return this.activeIndex === index;
+  }
 
   handleKeydown(event: KeyboardEvent) {
     switch (event.key) {
@@ -25,13 +32,6 @@ export class Listbox extends LitElement {
         break;
     }
   }
-
-  isSelected(index: number) {
-    return this.activeIndex === index;
-  }
-
-  @property()
-  optionTemplate = (option: unknown) => html`${option}`;
 
   render() {
     return html`
@@ -47,9 +47,8 @@ export class Listbox extends LitElement {
         ${repeat(this.options, (option) => option, (option, index) => html`
           <div
             aria-selected=${this.isSelected(index)}
-            class=${this.isSelected(index) ? 'selected' : ''}
             role="option"
-            part="option"
+            part=${this.isSelected(index) ? 'option-selected' : 'option'}
           >
             ${this.optionTemplate(option)}
           </div>
