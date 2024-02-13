@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { when } from 'lit/directives/when.js';
 
 @customElement('cs-listbox')
 export class Listbox extends LitElement {
@@ -48,7 +49,7 @@ export class Listbox extends LitElement {
           <div
             aria-selected=${this.isSelected(index)}
             role="option"
-            part=${this.isSelected(index) ? 'option-selected' : 'option'}
+            part="option ${when(this.isSelected(index), () => 'option-selected')}"
           >
             ${this.optionTemplate(option)}
           </div>
