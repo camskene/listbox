@@ -35,12 +35,12 @@ export class Listbox extends LitElement {
 
   render() {
     return html`
-      <p>ActiveIndex: ${this.activeIndex}</p>
       <div
         @keydown=${this.handleKeydown}
         aria-activedescendant=${this.activeIndex}
         aria-labelledby=""
         id="listbox"
+        role="listbox"
         tabindex="0"
         part="listbox"
       >
