@@ -1,10 +1,13 @@
 import { LitElement, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, queryAll, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { when } from 'lit/directives/when.js';
+import TypeAhead from './type-ahead';
 
 @customElement('cs-listbox')
 export class Listbox extends LitElement {
+  typeAhead: TypeAhead | undefined;
+
   @state()
   activeIndex = -1;
 
@@ -31,7 +34,21 @@ export class Listbox extends LitElement {
         event.preventDefault();
         this.activeIndex = previousIndex(this.activeIndex, this.options.length);
         break;
+      default:
+        if (!this.typeAhead) {
+          this.typeAhead = new TypeAhead(this.optionsTextContent);
+        }
+        this.activeIndex = this.typeAhead.findOptionIndex(event, this.activeIndex);
     }
+  }
+
+  @queryAll('[role="option"]')
+  optionNodes: HTMLOptionElement[] | undefined;
+
+  get optionsTextContent() {
+    if (!this.optionNodes) return [];
+
+    return [...this.optionNodes].map((node) => node.textContent && node.textContent.trim());
   }
 
   render() {
@@ -41,20 +58,19 @@ export class Listbox extends LitElement {
         aria-activedescendant=${this.activeIndex}
         aria-labelledby=""
         id="listbox"
+        part="listbox"
         role="listbox"
         tabindex="0"
-        part="listbox"
       >
         ${repeat(this.options, (option) => option, (option, index) => html`
           <div
             aria-selected=${this.isSelected(index)}
-            role="option"
             part="option ${when(this.isSelected(index), () => 'option-selected')}"
+            role="option"
           >
             ${this.optionTemplate(option)}
           </div>
         `)}
-        <slot></slot>
       </div>
     `
   }

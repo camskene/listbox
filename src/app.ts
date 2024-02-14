@@ -13,9 +13,17 @@ import './listbox.ts';
 
 const optionsObj = [
   { name: 'John' },
+  { name: 'Jude' },
+  { name: 'June' },
   { name: 'Paul' },
+  { name: 'Phil' },
+  { name: 'Prince' },
   { name: 'George' },
+  { name: 'Geoff' },
+  { name: 'Gary' },
   { name: 'Ringo' },
+  { name: 'Rodney' },
+  { name: 'Rick' },
 ];
 
 @customElement('cs-app')
@@ -24,16 +32,29 @@ export class App extends LitElement {
 
   protected render(): unknown {
     return html`
-      <cs-listbox id="listbox" .options=${optionsObj} .optionTemplate=${this.optionTemplate}></cs-listbox>
+      <cs-listbox
+        id="listbox"
+        .options=${optionsObj}
+        .optionTemplate=${this.optionTemplate}
+      >
+      </cs-listbox>
     `
   }
 
   static styles = css`
     cs-listbox {
+      &::part(listbox) {
+        width: 300px;
+        margin: 0 auto;
+        border: 1px solid gray;
+      }
       &::part(option):hover,
       &::part(option-selected) {
         color: white;
         background: rebeccapurple;
+      }
+      &::part(option) {
+        padding: 0.25rem 0.5rem;
       }
     }
   `
