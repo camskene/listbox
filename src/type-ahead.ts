@@ -1,58 +1,43 @@
+const QUERY_TIMEOUT = 400;
+
 export default class TypeAhead {
-  private namesByLetter: { [key: string]: string[] } = {};
-  private currentIndexes: { [key: string]: number } = {};
-  private previousLetter: string | null = null;
-  private options: (string | null)[] | undefined;
+  private options: (string | null)[];
+  private currentQuery: string = '';
+  private searchTimeout: number | undefined;
 
   constructor(options: (string | null)[]) {
-    if (options) {
-      this.options = options;
-
-      for (let text of options) {
-        if (!text) {
-          continue;
-        }
-
-        let firstLetter = text[0].toLowerCase();
-
-        if (!this.namesByLetter[firstLetter]) {
-          this.namesByLetter[firstLetter] = [];
-        }
-
-        this.namesByLetter[firstLetter].push(text);
-      }
-    }
+    this.options = options;
   }
 
   findOptionIndex(e: KeyboardEvent, activeIndex: number) {
-    let letter = e.key.toLowerCase();
-
-    if (!this.namesByLetter[letter]) {
+    if (!this.options) {
       return -1;
     }
 
-    if(this.previousLetter !== null && this.previousLetter !== letter) {
-      this.currentIndexes[this.previousLetter] = 0;
+    if (!e.key.match(/[a-z0-9]/i)) {
+      return -1;
     }
 
-    this.previousLetter = letter;
+    this.currentQuery += e.key.toLowerCase();;
 
-    if (this.currentIndexes[letter] === undefined) {
-      this.currentIndexes[letter] = 0;
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
     }
 
-    let name = this.namesByLetter[letter][this.currentIndexes[letter]];
+    this.searchTimeout = setTimeout(() => {
+      this.currentQuery = '';
+    }, QUERY_TIMEOUT);
 
-    if (!this.options) return -1;
+    let { length } = this.options;
 
-    for (let i = 0; i < this.options.length; i++) {
-      if (this.options[i] === name) {
-        activeIndex = i;
-        break;
+    for (let i = 0; i < length; i++) {
+      let index = (activeIndex + i + 1) % length;
+      let option = this.options[index] ?? '';
+
+      if (option.toLowerCase().startsWith(this.currentQuery)) {
+        return index;
       }
     }
-
-    this.currentIndexes[letter] = (this.currentIndexes[letter] + 1) % this.namesByLetter[letter].length;
 
     return activeIndex;
   }

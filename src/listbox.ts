@@ -38,12 +38,16 @@ export class Listbox extends LitElement {
         if (!this.typeAhead) {
           this.typeAhead = new TypeAhead(this.optionsTextContent);
         }
+
         this.activeIndex = this.typeAhead.findOptionIndex(event, this.activeIndex);
+
+        console.log('activeIndex', this.activeIndex)
+        break;
     }
   }
 
   @queryAll('[role="option"]')
-  optionNodes: HTMLOptionElement[] | undefined;
+  optionNodes: NodeListOf<HTMLOptionElement> | undefined;
 
   get optionsTextContent() {
     if (!this.optionNodes) return [];
