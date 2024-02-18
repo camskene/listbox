@@ -6,14 +6,13 @@ export default class TypeAhead {
   private searchTimeout: number | undefined;
 
   constructor(options: (string | null)[]) {
+    if (!options) {
+      throw new Error('TypeAhead requires options to be defined. Did you forget to pass them in?');
+    }
     this.options = options;
   }
 
   findOptionIndex(e: KeyboardEvent, activeIndex: number) {
-    if (!this.options) {
-      return -1;
-    }
-
     if (!e.key.match(/[a-z0-9]/i)) {
       return -1;
     }
