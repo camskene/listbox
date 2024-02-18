@@ -1,6 +1,5 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, queryAll, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
 import { when } from 'lit/directives/when.js';
 import TypeAhead from './type-ahead';
 
@@ -71,7 +70,7 @@ export class Listbox extends LitElement {
         role="listbox"
         tabindex="0"
       >
-        ${repeat(this.options, (option) => option, (option, index) => html`
+        ${this.options.map((option, index) => html`
           <div
             aria-selected=${this.isSelected(index)}
             part="option ${when(this.isSelected(index), () => 'option-selected')}"
