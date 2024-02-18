@@ -91,5 +91,9 @@ function nextIndex(activeIndex: number, numOptions: number) {
 }
 
 function previousIndex(activeIndex: number, numOptions: number) {
+  if (activeIndex === -1) {
+    return numOptions - 1;
+  }
+
   return (activeIndex - 1 + numOptions) % numOptions;
 }
