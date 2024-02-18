@@ -19,17 +19,21 @@ export class Listbox extends LitElement {
   @property()
   value: unknown;
 
-  isSelected(index: number) {
-    return this.activeIndex === index;
-  }
+  @queryAll('[role="option"]')
+  optionNodes: NodeListOf<HTMLOptionElement> | undefined;
 
   get selected() {
     return this.options[this.activeIndex];
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    this.activeIndex = this.options.findIndex((option) => option === this.value);
+  get optionsTextContent() {
+    if (!this.optionNodes) return [];
+
+    return [...this.optionNodes].map((node) => node.textContent && node.textContent.trim());
+  }
+
+  isSelected(index: number) {
+    return this.activeIndex === index;
   }
 
   handleKeydown(event: KeyboardEvent) {
@@ -59,13 +63,9 @@ export class Listbox extends LitElement {
     });
   }
 
-  @queryAll('[role="option"]')
-  optionNodes: NodeListOf<HTMLOptionElement> | undefined;
-
-  get optionsTextContent() {
-    if (!this.optionNodes) return [];
-
-    return [...this.optionNodes].map((node) => node.textContent && node.textContent.trim());
+  connectedCallback() {
+    super.connectedCallback();
+    this.activeIndex = this.options.findIndex((option) => option === this.value);
   }
 
   render() {
