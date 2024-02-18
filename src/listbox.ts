@@ -63,6 +63,15 @@ export class Listbox extends LitElement {
     });
   }
 
+  handleClick(event: Event) {
+    const { value } = event.target as HTMLOptionElement;
+    this.activeIndex = this.options.findIndex((option) => option === value);
+
+    this.updateComplete.then(() => {
+      dispatchCustomEvent(event, 'cs-change', this.selected);
+    });
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this.activeIndex = this.options.findIndex((option) => option === this.value);
@@ -71,6 +80,7 @@ export class Listbox extends LitElement {
   render() {
     return html`
       <div
+        @click=${this.handleClick}
         @keydown=${this.handleKeydown}
         aria-activedescendant=${this.activeIndex}
         aria-labelledby=""
@@ -83,6 +93,7 @@ export class Listbox extends LitElement {
             aria-selected=${this.isSelected(index)}
             part="option ${when(this.isSelected(index), () => 'option-selected')}"
             role="option"
+            .value=${option}
           >
             ${this.optionTemplate(option)}
           </div>
