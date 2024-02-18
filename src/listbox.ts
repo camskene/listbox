@@ -16,12 +16,20 @@ export class Listbox extends LitElement {
   @property()
   optionTemplate = (option: unknown) => html`${option}`;
 
+  @property()
+  value: unknown;
+
   isSelected(index: number) {
     return this.activeIndex === index;
   }
 
   get selected() {
     return this.options[this.activeIndex];
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.activeIndex = this.options.findIndex((option) => option === this.value);
   }
 
   handleKeydown(event: KeyboardEvent) {
@@ -45,7 +53,7 @@ export class Listbox extends LitElement {
 
       this.activeIndex = this.typeAhead.findOptionIndex(event, this.activeIndex);
     }
-    // https://lit.dev/docs/components/events/#when-to-dispatch-an-event
+
     this.updateComplete.then(() => {
       dispatchCustomEvent(event, 'cs-change', this.selected);
     });

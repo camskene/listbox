@@ -26,20 +26,25 @@ const optionsObj = [
   { name: 'Rick' },
 ];
 
+interface Option {
+  name: string;
+}
+
 @customElement('cs-app')
 export class App extends LitElement {
   optionTemplate = (option: Record<string, string>) => html`${option.name}`;
 
   @state()
-  selectedItem = '';
+  selectedOption: Option | undefined = optionsObj[6];
 
   protected render(): unknown {
     return html`
-      <p>Selected item: ${this.selectedItem}</p>
+      <p>Selected item: ${this.selectedOption?.name}</p>
       <cs-listbox
-        @cs-change=${({ detail }: CustomEvent) => this.selectedItem = detail.value.name}
+        @cs-change=${({ detail }: CustomEvent) => this.selectedOption = detail.value}
         .options=${optionsObj}
         .optionTemplate=${this.optionTemplate}
+        .value=${this.selectedOption}
       >
       </cs-listbox>
     `
