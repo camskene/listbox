@@ -17,33 +17,39 @@ export class Listbox extends LitElement {
   @property()
   optionTemplate = (option: unknown) => html`${option}`;
 
-  @property()
-  selected = this.options[this.activeIndex];
-
   isSelected(index: number) {
     return this.activeIndex === index;
   }
 
+  get selected() {
+    return this.options[this.activeIndex];
+  }
+
   handleKeydown(event: KeyboardEvent) {
-    switch (event.key) {
-      case 'ArrowDown':
-        event.preventDefault();
-        this.activeIndex = nextIndex(this.activeIndex, this.options.length);
-        break;
-      case 'ArrowUp':
-        event.preventDefault();
-        this.activeIndex = previousIndex(this.activeIndex, this.options.length);
-        break;
-      default:
-        if (!this.typeAhead) {
-          this.typeAhead = new TypeAhead(this.optionsTextContent);
-        }
-
-        this.activeIndex = this.typeAhead.findOptionIndex(event, this.activeIndex);
-
-        console.log('activeIndex', this.activeIndex)
-        break;
+    // Prevent page scrolling
+    if (['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) {
+      event.preventDefault();
     }
+
+    if (event.key === 'ArrowDown') {
+      this.activeIndex = nextIndex(this.activeIndex, this.options.length);
+    } else if (event.key === 'ArrowUp') {
+      this.activeIndex = previousIndex(this.activeIndex, this.options.length);
+    } else if (event.key === 'Home') {
+      this.activeIndex = 0;
+    } else if (event.key === 'End') {
+      this.activeIndex = this.options.length - 1;
+    } else {
+      if (!this.typeAhead) {
+        this.typeAhead = new TypeAhead(this.optionsTextContent);
+      }
+
+      this.activeIndex = this.typeAhead.findOptionIndex(event, this.activeIndex);
+    }
+    // https://lit.dev/docs/components/events/#when-to-dispatch-an-event
+    this.updateComplete.then(() => {
+      dispatchCustomEvent(event, 'cs-change', this.selected);
+    });
   }
 
   @queryAll('[role="option"]')
@@ -61,7 +67,6 @@ export class Listbox extends LitElement {
         @keydown=${this.handleKeydown}
         aria-activedescendant=${this.activeIndex}
         aria-labelledby=""
-        id="listbox"
         part="listbox"
         role="listbox"
         tabindex="0"
@@ -96,4 +101,13 @@ function previousIndex(activeIndex: number, numOptions: number) {
   }
 
   return (activeIndex - 1 + numOptions) % numOptions;
+}
+
+function dispatchCustomEvent(event: Event, name: string, value: unknown) {
+  event.target?.dispatchEvent(new CustomEvent(name, {
+    bubbles: true,
+    cancelable: false,
+    composed: true,
+    detail: { value }
+  }));
 }

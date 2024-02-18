@@ -1,5 +1,5 @@
 import { LitElement, css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 
 import './listbox.ts';
 
@@ -30,10 +30,14 @@ const optionsObj = [
 export class App extends LitElement {
   optionTemplate = (option: Record<string, string>) => html`${option.name}`;
 
+  @state()
+  selectedItem = '';
+
   protected render(): unknown {
     return html`
+      <p>Selected item: ${this.selectedItem}</p>
       <cs-listbox
-        id="listbox"
+        @cs-change=${({ detail }: CustomEvent) => this.selectedItem = detail.value.name}
         .options=${optionsObj}
         .optionTemplate=${this.optionTemplate}
       >
