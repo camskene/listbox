@@ -9,6 +9,13 @@ export type OptionTemplate<T> = (option: T) => TemplateResult;
 export class Listbox extends LitElement {
   typeAhead: TypeAhead | undefined;
 
+  constructor() {
+    super();
+    this.updateComplete.then(() => {
+      this.activeIndex = this.options.findIndex((option) => option === this.value);
+    })
+  }
+
   @state()
   activeIndex = -1;
 
@@ -72,11 +79,6 @@ export class Listbox extends LitElement {
     this.updateComplete.then(() => {
       dispatchCustomEvent(event, 'cs-change', this.selected);
     });
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    this.activeIndex = this.options.findIndex((option) => option === this.value);
   }
 
   render() {
