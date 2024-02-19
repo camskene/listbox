@@ -1,7 +1,9 @@
-import { LitElement, html } from 'lit';
+import { LitElement, TemplateResult, html } from 'lit';
 import { customElement, property, queryAll, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import TypeAhead from './type-ahead';
+
+export type OptionTemplate<T> = (option: T) => TemplateResult;
 
 @customElement('cs-listbox')
 export class Listbox extends LitElement {
@@ -11,10 +13,10 @@ export class Listbox extends LitElement {
   activeIndex = -1;
 
   @property()
-  options = [];
+  options: unknown[] = [];
 
   @property()
-  optionTemplate = (option: unknown) => html`${option}`;
+  optionTemplate: OptionTemplate<any> = (option) => html`${option}`;
 
   @property()
   value: unknown;
@@ -106,6 +108,10 @@ export class Listbox extends LitElement {
 declare global {
   interface HTMLElementTagNameMap {
     'cs-listbox': Listbox
+  }
+
+  interface HTMLElementEventMap {
+    'cs-change': CustomEvent
   }
 }
 
