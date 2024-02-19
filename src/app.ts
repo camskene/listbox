@@ -4,13 +4,13 @@ import { customElement, query, state } from 'lit/decorators.js';
 import './listbox.ts';
 import type { Listbox } from './listbox.ts';
 
-// const options = [
-//   'John',
-//   'Paul',
-//   'George',
-//   'Ringo',
-//   'Cam'
-// ]
+const options = [
+  'John',
+  'Paul',
+  'George',
+  'Ringo',
+  'Cam'
+]
 
 const optionsObj = [
   { name: 'John' },
@@ -27,11 +27,15 @@ const optionsObj = [
   { name: 'Rick' },
 ];
 
+interface Option {
+  name: string;
+}
+
 import type { OptionTemplate } from './listbox';
 
 @customElement('cs-app')
 export class App extends LitElement {
-  optionTemplate: OptionTemplate<any> = (option) => html`${option.name}`;
+  optionTemplate: OptionTemplate<Option> = (option) => html`${option.name}`;
 
   @state()
   selectedOption = optionsObj[3];
@@ -42,8 +46,8 @@ export class App extends LitElement {
   constructor() {
     super();
     this.updateComplete.then(() => {
-      this.listbox.options = optionsObj;
-      this.listbox.optionTemplate = this.optionTemplate;
+      this.listbox.options = options;
+      this.listbox.optionTemplate = (option) => html`${option}`;
       this.listbox.value = this.listbox.options[3];
       this.listbox.addEventListener('cs-change', ({ detail }: CustomEvent) => {
         this.selectedOption = detail

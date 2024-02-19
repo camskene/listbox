@@ -23,7 +23,7 @@ export class Listbox extends LitElement {
   options: unknown[] = [];
 
   @property()
-  optionTemplate: OptionTemplate<any> = (option) => html`${option}`;
+  optionTemplate: OptionTemplate<unknown> = (option) => html`${option}`;
 
   @property()
   value: unknown;
