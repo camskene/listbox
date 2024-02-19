@@ -1,7 +1,8 @@
 import { LitElement, css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, query, state } from 'lit/decorators.js';
 
 import './listbox.ts';
+import type { Listbox } from './listbox.ts';
 
 // const options = [
 //   'John',
@@ -26,27 +27,43 @@ const optionsObj = [
   { name: 'Rick' },
 ];
 
-interface Option {
-  name: string;
-}
+import type { OptionTemplate } from './listbox';
 
 @customElement('cs-app')
 export class App extends LitElement {
-  optionTemplate = (option: Record<string, string>) => html`${option.name}`;
+  optionTemplate: OptionTemplate<any> = (option) => html`${option.name}`;
 
   @state()
-  selectedOption: Option | undefined = optionsObj[6];
+  selectedOption = optionsObj[3];
 
-  protected render(): unknown {
+  @query('#listbox')
+  listbox!: Listbox;
+
+  constructor() {
+    super();
+    this.updateComplete.then(() => {
+      this.listbox.options = optionsObj;
+      this.listbox.optionTemplate = this.optionTemplate;
+      this.listbox.value = this.listbox.options[3];
+      this.listbox.addEventListener('cs-change', ({ detail }: CustomEvent) => {
+        this.selectedOption = detail
+      });
+    })
+  }
+
+  protected render() {
     return html`
-      <p>Selected item: ${this.selectedOption?.name}</p>
+      <p>Value: ${this.selectedOption?.name}</p>
+
       <cs-listbox
-        @cs-change=${({ detail }: CustomEvent) => this.selectedOption = detail.value}
+        @cs-change=${({ detail }: CustomEvent) => this.selectedOption = detail}
         .options=${optionsObj}
         .optionTemplate=${this.optionTemplate}
         .value=${this.selectedOption}
       >
       </cs-listbox>
+
+      <cs-listbox id="listbox"></cs-listbox>
     `
   }
 

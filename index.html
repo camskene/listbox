@@ -4,15 +4,74 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Listbox</title>
-    <script type="module" src="/src/app.ts"></script>
     <style>
       body {
         font-family: system-ui;
         margin: 0;
       }
+
+      cs-listbox {
+        &::part(listbox) {
+          width: 300px;
+          margin: 0 auto;
+          border: 1px solid gray;
+        }
+        &::part(option):hover,
+        &::part(option-selected) {
+          color: white;
+          background: rebeccapurple;
+        }
+        &::part(option) {
+          padding: 0.25rem 0.5rem;
+        }
+      }
       </style>
   </head>
   <body>
-    <cs-app></cs-app>
+    <div style="display: flex; justify-content: center; gap: 3rem">
+      <div>
+        <p>Value: <span id="listbox-value"></span></p>
+        <cs-listbox></cs-listbox>
+      </div>
+      <div>
+        <cs-app></cs-app>
+      </div>
+    </div>
+
+
+    <script type="module">
+      import { html } from 'lit';
+      import './src/listbox';
+      import './src/app';
+
+      const listbox = document.querySelector("cs-listbox");
+
+      let options = [
+        { name: 'John' },
+        { name: 'Jude' },
+        { name: 'June' },
+        { name: 'Paul' },
+        { name: 'Phil' },
+        { name: 'Prince' },
+        { name: 'George' },
+        { name: 'Geoff' },
+        { name: 'Gary' },
+        { name: 'Ringo' },
+        { name: 'Rodney' },
+        { name: 'Rick' },
+      ];
+
+      const selectedOption = document.getElementById("listbox-value");
+
+      listbox.options = options;
+      listbox.optionTemplate = (option) => html`${option.name}`;
+
+      listbox.value = options[4];
+      selectedOption.textContent = listbox.value.name
+
+      listbox.addEventListener("cs-change", ({ detail }) => {
+        selectedOption.textContent = `${event.detail.name}`;
+      });
+    </script>
   </body>
 </html>
