@@ -127,11 +127,11 @@ function previousIndex(activeIndex: number, numOptions: number) {
   return (activeIndex - 1 + numOptions) % numOptions;
 }
 
-function dispatchCustomEvent(event: Event, name: string, value: unknown) {
+function dispatchCustomEvent(event: Event, name: string, detail: unknown) {
   event.target?.dispatchEvent(new CustomEvent(name, {
     bubbles: true,
     cancelable: false,
     composed: true,
-    detail: { value }
+    detail,
   }));
 }
