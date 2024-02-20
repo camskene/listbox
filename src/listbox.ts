@@ -19,11 +19,14 @@ export class Listbox extends LitElement {
   @state()
   activeIndex = -1;
 
+  @property({ type: Boolean })
+  multiple = false;
+
   @property()
   options: unknown[] = [];
 
   @property()
-  optionTemplate: OptionTemplate<unknown> = (option) => html`${option}`;
+  optionTemplate: OptionTemplate<any> = (option) => html`${option}`;
 
   @property()
   value: unknown;
@@ -59,7 +62,7 @@ export class Listbox extends LitElement {
       this.activeIndex = 0;
     } else if (event.key === 'End') {
       this.activeIndex = this.options.length - 1;
-    } else {
+    } else if (event.key.match(/[a-z0-9]/i)) {
       if (!this.typeAhead) {
         this.typeAhead = new TypeAhead(this.optionsTextContent);
       }
@@ -68,7 +71,11 @@ export class Listbox extends LitElement {
     }
 
     this.updateComplete.then(() => {
-      dispatchCustomEvent(event, 'cs-change', this.selected);
+      if (!this.multiple) {
+        dispatchCustomEvent(event, 'cs-change', this.selected);
+      } else if (event.key === 'Enter' || event.key === ' ') {
+        dispatchCustomEvent(event, 'cs-change', this.selected);
+      }
     });
   }
 

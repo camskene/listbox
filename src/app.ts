@@ -38,36 +38,39 @@ export class App extends LitElement {
   optionTemplate: OptionTemplate<Option> = (option) => html`${option.name}`;
 
   @state()
-  selectedOption = optionsObj[3];
+  selectedOption = 'John';
 
-  @query('#listbox')
-  listbox!: Listbox;
+  @state()
+  selectedOptions: Option[] = [];
+
+  @query('#listbox-multiple')
+  listboxMultiple!: Listbox;
 
   constructor() {
     super();
     this.updateComplete.then(() => {
-      this.listbox.options = options;
-      this.listbox.optionTemplate = (option) => html`${option}`;
-      this.listbox.value = this.listbox.options[3];
-      this.listbox.addEventListener('cs-change', ({ detail }: CustomEvent) => {
-        this.selectedOption = detail
+      this.listboxMultiple.options = optionsObj;
+      this.listboxMultiple.value = this.listboxMultiple.options[3];
+      this.listboxMultiple.optionTemplate = this.optionTemplate;
+      this.listboxMultiple.addEventListener('cs-change', ({ detail }: CustomEvent) => {
+        this.selectedOptions.push(detail);
+        this.requestUpdate();
       });
     })
   }
 
   protected render() {
     return html`
-      <p>Value: ${this.selectedOption?.name}</p>
+      <p>Values: ${this.selectedOptions.map(option => option.name)}</p>
+      <cs-listbox multiple id="listbox-multiple"></cs-listbox>
 
+      <p>Value:  ${this.selectedOption}</p>
       <cs-listbox
         @cs-change=${({ detail }: CustomEvent) => this.selectedOption = detail}
-        .options=${optionsObj}
-        .optionTemplate=${this.optionTemplate}
+        .options=${options}
         .value=${this.selectedOption}
-      >
+        >
       </cs-listbox>
-
-      <cs-listbox id="listbox"></cs-listbox>
     `
   }
 
