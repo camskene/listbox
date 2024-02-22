@@ -41,7 +41,7 @@ export class App extends LitElement {
   selectedOption = optionsObj[3];
 
   @query('#listbox')
-  listbox!: Listbox;
+  listbox!: Listbox<string>;
 
   constructor() {
     super();

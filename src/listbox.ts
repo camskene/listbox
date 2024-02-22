@@ -1,12 +1,12 @@
-import { LitElement, TemplateResult, html } from 'lit';
+import { LitElement, TemplateResult, html  } from 'lit';
 import { customElement, property, queryAll, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import TypeAhead from './type-ahead';
 
-export type OptionTemplate<T> = (option: T) => TemplateResult;
+export type OptionTemplate<T = unknown> = (option: T) => TemplateResult;
 
 @customElement('cs-listbox')
-export class Listbox extends LitElement {
+export class Listbox<TData = unknown> extends LitElement {
   typeAhead: TypeAhead | undefined;
 
   constructor() {
@@ -20,10 +20,10 @@ export class Listbox extends LitElement {
   activeIndex = -1;
 
   @property()
-  options: unknown[] = [];
+  options: TData[] = [];
 
   @property()
-  optionTemplate: OptionTemplate<unknown> = (option) => html`${option}`;
+  optionTemplate: OptionTemplate<TData> = (option) => html`${option}`;
 
   @property()
   value: unknown;
