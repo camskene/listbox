@@ -22,13 +22,13 @@ export class Listbox extends LitElement {
   @property({ type: Boolean })
   multiple = false;
 
-  @property()
+  @property({ type: Array })
   options: unknown[] = [];
 
-  @property()
+  @property({ attribute: false })
   optionTemplate: OptionTemplate<any> = (option) => html`${option}`;
 
-  @property()
+  @property({ attribute: false })
   value: unknown;
 
   @queryAll('[role="option"]')
