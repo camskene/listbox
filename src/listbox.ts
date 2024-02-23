@@ -114,16 +114,6 @@ export class Listbox extends LitElement {
   }
 }
 
-declare global {
-  interface HTMLElementTagNameMap {
-    'cs-listbox': Listbox
-  }
-
-  interface HTMLElementEventMap {
-    'cs-change': CustomEvent
-  }
-}
-
 function nextIndex(activeIndex: number, numOptions: number) {
   return (activeIndex + 1) % numOptions;
 }
@@ -143,4 +133,14 @@ function dispatchCustomEvent(event: Event, name: string, detail: unknown) {
     composed: true,
     detail,
   }));
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'cs-listbox': Listbox
+  }
+
+  interface HTMLElementEventMap {
+    'cs-change': CustomEvent
+  }
 }
