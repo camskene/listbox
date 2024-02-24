@@ -53,8 +53,9 @@ export class Listbox extends LitElement {
     if (['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) {
       event.preventDefault();
     }
-
-    if (event.key === 'ArrowDown') {
+    if (event.key === 'Tab') {
+      return this.activeIndex;
+    } else if (event.key === 'ArrowDown') {
       this.activeIndex = nextIndex(this.activeIndex, this.options.length);
     } else if (event.key === 'ArrowUp') {
       this.activeIndex = previousIndex(this.activeIndex, this.options.length);
