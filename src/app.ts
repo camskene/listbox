@@ -4,7 +4,7 @@ import { customElement, query, state } from 'lit/decorators.js';
 import './listbox.ts';
 import type { Listbox } from './listbox.ts';
 
-const options = [
+const optionsStr = [
   'John',
   'Paul',
   'George',
@@ -35,10 +35,24 @@ import type { OptionTemplate } from './listbox';
 
 @customElement('cs-app')
 export class App extends LitElement {
-  optionTemplate: OptionTemplate<Option> = (option) => html`${option.name}`;
+  optionTemplateMultiple: OptionTemplate<Option> = (option) => html`${option.name}`;
+
+  constructor() {
+    super();
+    this.updateComplete.then(() => {
+      this.listboxMultiple.options = optionsObj;
+      this.selectedOptions = [optionsObj[1], optionsObj[4]];
+      this.listboxMultiple.value = this.selectedOptions;
+      this.listboxMultiple.optionTemplate = this.optionTemplateMultiple;
+      this.listboxMultiple.addEventListener('cs-change', ({ detail }: CustomEvent) => {
+        this.selectedOptions = detail;
+        this.requestUpdate();
+      });
+    })
+  }
 
   @state()
-  selectedOption = 'John';
+  selectedOption = ['John'];
 
   @state()
   selectedOptions: Option[] = [];
@@ -46,31 +60,30 @@ export class App extends LitElement {
   @query('#listbox-multiple')
   listboxMultiple!: Listbox;
 
-  constructor() {
-    super();
-    this.updateComplete.then(() => {
-      this.listboxMultiple.options = optionsObj;
-      this.listboxMultiple.value = this.listboxMultiple.options[3];
-      this.listboxMultiple.optionTemplate = this.optionTemplate;
-      this.listboxMultiple.addEventListener('cs-change', ({ detail }: CustomEvent) => {
-        this.selectedOptions.push(detail);
-        this.requestUpdate();
-      });
-    })
-  }
-
   protected render() {
     return html`
-      <p>Values: ${this.selectedOptions.map(option => option.name)}</p>
-      <cs-listbox multiple id="listbox-multiple"></cs-listbox>
+      <div style="display: flex; justify-content: center; gap: 3rem">
+        <div>
+          <p>Values: ${this.selectedOptions.map(option => option.name).join(', ')}</p>
+          <cs-listbox multiple id="listbox-multiple"></cs-listbox>
+        </div>
 
-      <p>Value:  ${this.selectedOption}</p>
-      <cs-listbox
-        @cs-change=${({ detail }: CustomEvent) => this.selectedOption = detail}
-        .options=${options}
-        .value=${this.selectedOption}
-        >
-      </cs-listbox>
+        <div>
+          <p>Value: ${this.selectedOption.map(option => option).join(', ')}</p>
+          <cs-listbox
+            multiple
+            @cs-change=${({ detail }: CustomEvent) => {
+                console.log(detail);
+                this.selectedOption = detail
+                this.requestUpdate();
+              }
+            }
+            .options=${optionsStr}
+            .value=${this.selectedOption}
+            >
+          </cs-listbox>
+        </div>
+      </div>
     `
   }
 
@@ -81,16 +94,19 @@ export class App extends LitElement {
         margin: 0 auto;
         border: 1px solid gray;
       }
+      &::part(option) {
+        padding: 0.25rem 0.5rem;
+      }
       &::part(option):hover,
+      &::part(option-active) {
+        background: aqua;
+      }
       &::part(option-selected) {
         color: white;
         background: rebeccapurple;
       }
-      &::part(option) {
-        padding: 0.25rem 0.5rem;
-      }
     }
-  `
+  `;
 }
 
 declare global {

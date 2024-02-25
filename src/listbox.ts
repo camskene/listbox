@@ -1,9 +1,9 @@
 import { LitElement, TemplateResult, html } from 'lit';
 import { customElement, property, queryAll, state } from 'lit/decorators.js';
-import { when } from 'lit/directives/when.js';
 import TypeAhead from './type-ahead';
 
 export type OptionTemplate<T> = (option: T) => TemplateResult;
+export type OptionValue = string | Record<string, unknown>;
 
 @customElement('cs-listbox')
 export class Listbox extends LitElement {
@@ -12,8 +12,14 @@ export class Listbox extends LitElement {
   constructor() {
     super();
     this.updateComplete.then(() => {
-      this.activeIndex = this.options.findIndex((option) => option === this.value);
+      const value = Array.isArray(this.value) ? this.value[0] : this.value;
+      this.activeIndex = this.options.findIndex((option) => option === value);
+
+      if (this.multiple && !Array.isArray(this.value)) {
+        this.value = [this.value];
+      }
     })
+
   }
 
   @state()
@@ -23,13 +29,13 @@ export class Listbox extends LitElement {
   multiple = false;
 
   @property({ type: Array })
-  options: unknown[] = [];
+  options: OptionValue[] = [];
 
-  @property({ attribute: false })
+  @property()
   optionTemplate: OptionTemplate<any> = (option) => html`${option}`;
 
-  @property({ attribute: false })
-  value: unknown;
+  @property()
+  value: any = [];
 
   @queryAll('[role="option"]')
   optionNodes: NodeListOf<HTMLOptionElement> | undefined;
@@ -44,8 +50,16 @@ export class Listbox extends LitElement {
     return [...this.optionNodes].map((node) => node.textContent && node.textContent.trim());
   }
 
-  isSelected(index: number) {
+  isActiveDescendant(index: number) {
     return this.activeIndex === index;
+  }
+
+  isSelected(option: any, index: number) {
+    if (!this.multiple) {
+      return this.isActiveDescendant(index);
+    }
+
+    return this.value.length && this.value.includes(option);
   }
 
   handleKeydown(event: KeyboardEvent) {
@@ -73,19 +87,33 @@ export class Listbox extends LitElement {
 
     this.updateComplete.then(() => {
       if (!this.multiple) {
-        dispatchCustomEvent(event, 'cs-change', this.selected);
+        this.value = this.selected;
       } else if (event.key === 'Enter' || event.key === ' ') {
-        dispatchCustomEvent(event, 'cs-change', this.selected);
+        if (!this.value.includes(this.selected)) {
+          this.value.push(this.selected);
+        } else {
+          this.value = this.value.filter((option: OptionValue) => option !== this.selected);
+        }
       }
+      dispatchCustomEvent(event, 'cs-change', this.value);
     });
   }
 
-  handleClick(event: Event) {
+  handleClick(event: PointerEvent) {
     const { value } = event.target as HTMLOptionElement;
     this.activeIndex = this.options.findIndex((option) => option === value);
 
     this.updateComplete.then(() => {
-      dispatchCustomEvent(event, 'cs-change', this.selected);
+      if (!this.multiple) {
+        this.value = this.selected;
+      } else {
+        if (!this.value.includes(this.selected)) {
+          this.value.push(this.selected);
+        } else {
+          this.value = this.value.filter((option: OptionValue) => option !== this.selected);
+        }
+      }
+      dispatchCustomEvent(event, 'cs-change', this.value);
     });
   }
 
@@ -95,15 +123,16 @@ export class Listbox extends LitElement {
         @click=${this.handleClick}
         @keydown=${this.handleKeydown}
         aria-activedescendant=${this.activeIndex}
-        aria-labelledby=""
+        aria-multiselectable=${this.multiple}
         part="listbox"
         role="listbox"
         tabindex="0"
       >
         ${this.options.map((option, index) => html`
           <div
-            aria-selected=${this.isSelected(index)}
-            part="option ${when(this.isSelected(index), () => 'option-selected')}"
+            aria-selected=${this.isSelected(option, index)}
+            id=${index}
+            part="option ${whilst(this.isActiveDescendant(index), 'option-active')} ${whilst(this.isSelected(option, index), 'option-selected')} "
             role="option"
             .value=${option}
           >
@@ -125,6 +154,12 @@ function previousIndex(activeIndex: number, numOptions: number) {
   }
 
   return (activeIndex - 1 + numOptions) % numOptions;
+}
+
+function whilst(condition: boolean, value: string) {
+  if (condition) {
+    return value;
+  }
 }
 
 function dispatchCustomEvent(event: Event, name: string, detail: unknown) {

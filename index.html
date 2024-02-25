@@ -16,16 +16,19 @@
           margin: 0 auto;
           border: 1px solid gray;
         }
+        &::part(option) {
+          padding: 0.25rem 0.5rem;
+        }
         &::part(option):hover,
+        &::part(option-active) {
+          background: aqua;
+        }
         &::part(option-selected) {
           color: white;
           background: rebeccapurple;
         }
-        &::part(option) {
-          padding: 0.25rem 0.5rem;
-        }
       }
-      </style>
+    </style>
   </head>
   <body>
     <div style="display: flex; justify-content: center; gap: 3rem">
@@ -35,7 +38,7 @@
 
       <div>
         <p>Value: <span id="listbox-value"></span></p>
-        <cs-listbox></cs-listbox>
+        <cs-listbox multiple></cs-listbox>
       </div>
     </div>
 
@@ -45,9 +48,7 @@
       import './src/listbox';
       import './src/app';
 
-      const listbox = document.querySelector("cs-listbox");
-
-      let options = [
+      const options = [
         { name: 'John' },
         { name: 'Jude' },
         { name: 'June' },
@@ -62,17 +63,17 @@
         { name: 'Rick' },
       ];
 
-      const selectedOption = document.getElementById("listbox-value");
+      const listboxMultiple = document.querySelector("cs-listbox");
+      const valuesElem = document.getElementById("listbox-value");
 
-      listbox.options = options;
-      listbox.optionTemplate = (option) => html`${option.name}`;
-
-      listbox.value = options[4];
-      selectedOption.textContent = listbox.value.name
-
-      listbox.addEventListener("cs-change", ({ detail }) => {
-        selectedOption.textContent = `${event.detail.name}`;
+      listboxMultiple.options = options;
+      listboxMultiple.value = options[4];
+      listboxMultiple.optionTemplate = (option) => html`${option.name}`;
+      listboxMultiple.addEventListener("cs-change", ({ detail }) => {
+        valuesElem.textContent = event.detail.map(option => option.name);
       });
+
+      valuesElem.textContent = options[4].name;
     </script>
   </body>
 </html>
