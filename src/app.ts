@@ -52,7 +52,7 @@ export class App extends LitElement {
   }
 
   @state()
-  selectedOption = ['John'];
+  selectedOption = 'John';
 
   @state()
   selectedOptions: Option[] = [];
@@ -64,24 +64,20 @@ export class App extends LitElement {
     return html`
       <div style="display: flex; justify-content: center; gap: 3rem">
         <div>
-          <p>Values: ${this.selectedOptions.map(option => option.name).join(', ')}</p>
-          <cs-listbox multiple id="listbox-multiple"></cs-listbox>
-        </div>
-
-        <div>
-          <p>Value: ${this.selectedOption.map(option => option).join(', ')}</p>
+          <p>Value: ${this.selectedOption}</p>
           <cs-listbox
-            multiple
             @cs-change=${({ detail }: CustomEvent) => {
-                console.log(detail);
                 this.selectedOption = detail
-                this.requestUpdate();
               }
             }
             .options=${optionsStr}
             .value=${this.selectedOption}
             >
           </cs-listbox>
+        </div>
+        <div>
+          <p>Values: ${this.selectedOptions.map(option => option.name).join(', ')}</p>
+          <cs-listbox label="names" multiple id="listbox-multiple"></cs-listbox>
         </div>
       </div>
     `

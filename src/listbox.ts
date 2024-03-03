@@ -9,8 +9,9 @@ export type OptionValue = string | Record<string, unknown>;
 export class Listbox extends LitElement {
   typeAhead: TypeAhead | undefined;
 
-  constructor() {
-    super();
+  connectedCallback() {
+    super.connectedCallback();
+
     this.updateComplete.then(() => {
       const value = Array.isArray(this.value) ? this.value[0] : this.value;
       this.activeIndex = this.options.findIndex((option) => option === value);
@@ -18,8 +19,7 @@ export class Listbox extends LitElement {
       if (this.multiple && !Array.isArray(this.value)) {
         this.value = [this.value];
       }
-    })
-
+    });
   }
 
   @state()
@@ -88,18 +88,19 @@ export class Listbox extends LitElement {
     this.updateComplete.then(() => {
       if (!this.multiple) {
         this.value = this.selected;
+        dispatchCustomEvent(event, 'cs-change', this.value);
       } else if (event.key === 'Enter' || event.key === ' ') {
         if (!this.value.includes(this.selected)) {
           this.value.push(this.selected);
         } else {
           this.value = this.value.filter((option: OptionValue) => option !== this.selected);
         }
+        dispatchCustomEvent(event, 'cs-change', this.value);
       }
-      dispatchCustomEvent(event, 'cs-change', this.value);
     });
   }
 
-  handleClick(event: PointerEvent) {
+  handleClick(event: MouseEvent) {
     const { value } = event.target as HTMLOptionElement;
     this.activeIndex = this.options.findIndex((option) => option === value);
 
