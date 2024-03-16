@@ -1,4 +1,4 @@
-import { LitElement, TemplateResult, html } from 'lit';
+import { LitElement, TemplateResult, css, html } from 'lit';
 import { customElement, property, queryAll, state } from 'lit/decorators.js';
 import TypeAhead from './type-ahead';
 
@@ -134,8 +134,9 @@ export class Listbox extends LitElement {
         ${this.options.map((option, index) => html`
           <div
             aria-selected=${this.isSelected(option, index)}
-            id=${index}
-            part="option ${whilst(this.isActiveDescendant(index), 'option-active')} ${whilst(this.isSelected(option, index), 'option-selected')} "
+            class="${whilst(this.isActiveDescendant(index), 'option-active')} ${whilst(this.isSelected(option, index), 'option-selected')}"
+            id="option-${index}"
+            part="option ${whilst(this.isActiveDescendant(index), 'option-active')} ${whilst(this.isSelected(option, index), 'option-selected')}"
             role="option"
             .value=${option}
           >
@@ -145,6 +146,32 @@ export class Listbox extends LitElement {
       </div>
     `
   }
+
+  static styles = css`
+    [role="listbox"] {
+      width: var(--cs-listbox-width, 300px);
+      border: var(--cs-listbox-border, 1px solid gray);
+    }
+
+    [role="option"] {
+      color: var(--cs-option-color, black);
+      padding: var(--cs-option-padding, 0.25rem 0.5rem);
+    }
+
+    [role="option"]:not(.option-selected):hover {
+      background: var(--cs-option-background-color-hover, aqua);
+    }
+
+    .option-active {
+      color: var(--cs-option-color-active, black);
+      background: var(--cs-option-background-color-active, aqua);
+    }
+
+    .option-selected {
+      color: var(--cs-option-color-selected, white);
+      background: var(--cs-option-background-color-selected, rebeccapurple);
+    }
+  `;
 }
 
 function nextIndex(activeIndex: number, numOptions: number) {
