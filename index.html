@@ -9,71 +9,14 @@
         font-family: system-ui;
         margin: 0;
       }
-
-      cs-listbox {
-        &::part(listbox) {
-          width: 300px;
-          margin: 0 auto;
-          border: 1px solid gray;
-        }
-        &::part(option) {
-          padding: 0.25rem 0.5rem;
-        }
-        &::part(option):hover,
-        &::part(option-active) {
-          background: aqua;
-        }
-        &::part(option-selected) {
-          color: white;
-          background: rebeccapurple;
-        }
-      }
     </style>
+    <script type="module" src="./src/select-single.ts"></script>
+    <script type="module" src="./src/select-multiple.ts"></script>
   </head>
   <body>
-    <div style="display: flex; justify-content: center; gap: 3rem">
-      <div>
-        <cs-app></cs-app>
-      </div>
-
-      <!-- <div>
-        <p>HTML multiple value: <span id="listbox-value"></span></p>
-        <cs-listbox multiple></cs-listbox>
-      </div> -->
+    <div style="display: flex; flex-direction: column; justify-content: center; gap: 3rem; padding: 3rem">
+      <select-single></select-single>
+      <select-multiple></select-multiple>
     </div>
-
-
-    <script type="module">
-      import { html } from 'lit';
-      import './src/listbox';
-      import './src/app';
-
-      const options = [
-        { name: 'John' },
-        { name: 'Jude' },
-        { name: 'June' },
-        { name: 'Paul' },
-        { name: 'Phil' },
-        { name: 'Prince' },
-        { name: 'George' },
-        { name: 'Geoff' },
-        { name: 'Gary' },
-        { name: 'Ringo' },
-        { name: 'Rodney' },
-        { name: 'Rick' },
-      ];
-
-      const listboxMultiple = document.querySelector("cs-listbox");
-      const valuesElem = document.getElementById("listbox-value");
-
-      listboxMultiple.options = options;
-      listboxMultiple.value = options[4];
-      listboxMultiple.optionTemplate = (option) => html`${option.name}`;
-      listboxMultiple.addEventListener("cs-change", ({ detail }) => {
-        valuesElem.textContent = event.detail.map(option => option.name);
-      });
-
-      valuesElem.textContent = options[4].name;
-    </script>
   </body>
 </html>
