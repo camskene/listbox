@@ -92,6 +92,7 @@ export class Listbox extends LitElement {
       } else if (event.key === 'Enter' || event.key === ' ') {
         if (!this.value.includes(this.selected)) {
           this.value.push(this.selected);
+          this.requestUpdate();
         } else {
           this.value = this.value.filter((option: OptionValue) => option !== this.selected);
         }
@@ -110,6 +111,7 @@ export class Listbox extends LitElement {
       } else {
         if (!this.value.includes(this.selected)) {
           this.value.push(this.selected);
+          this.requestUpdate();
         } else {
           this.value = this.value.filter((option: OptionValue) => option !== this.selected);
         }
