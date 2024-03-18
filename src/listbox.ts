@@ -1,5 +1,7 @@
 import { LitElement, TemplateResult, css, html } from 'lit';
 import { customElement, property, queryAll, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
+
 import TypeAhead from './type-ahead';
 
 export type OptionTemplate<T> = (option: T) => TemplateResult;
@@ -63,8 +65,9 @@ export class Listbox extends LitElement {
   }
 
   handleKeydown(event: KeyboardEvent) {
+    const SPACE = ' ';
     // Prevent page scrolling
-    if (['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) {
+    if (['ArrowUp', 'ArrowDown', 'Home', 'End', SPACE].includes(event.key)) {
       event.preventDefault();
     }
     if (event.key === 'Tab') {
@@ -89,7 +92,10 @@ export class Listbox extends LitElement {
       if (!this.multiple) {
         this.value = this.selected;
         dispatchCustomEvent(event, 'cs-change', this.value);
-      } else if (event.key === 'Enter' || event.key === ' ') {
+        return;
+      }
+
+      if (event.key === 'Enter' || event.key === SPACE) {
         if (!this.value.includes(this.selected)) {
           this.value.push(this.selected);
           this.requestUpdate();
@@ -120,13 +126,30 @@ export class Listbox extends LitElement {
     });
   }
 
+  get activeDescendant() {
+    if (this.activeIndex < 0) {
+      return;
+    }
+
+    return `option-${this.activeIndex}`;
+  }
+
+  get multiSelectable() {
+    if (this.multiple === false) {
+      return;
+    }
+
+    return this.multiple;
+  }
+
   render() {
     return html`
       <div
         @click=${this.handleClick}
         @keydown=${this.handleKeydown}
-        aria-activedescendant=${this.activeIndex}
-        aria-multiselectable=${this.multiple}
+        aria-activedescendant=${ifDefined(this.activeDescendant)}
+        aria-label="listbox"
+        aria-multiselectable=${ifDefined(this.multiSelectable)}
         part="listbox"
         role="listbox"
         tabindex="0"
@@ -174,11 +197,11 @@ export class Listbox extends LitElement {
   `;
 }
 
-function nextIndex(activeIndex: number, numOptions: number) {
+export function nextIndex(activeIndex: number = -1, numOptions: number) {
   return (activeIndex + 1) % numOptions;
 }
 
-function previousIndex(activeIndex: number, numOptions: number) {
+export function previousIndex(activeIndex: number = -1, numOptions: number) {
   if (activeIndex === -1) {
     return numOptions - 1;
   }

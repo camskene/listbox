@@ -31,7 +31,6 @@ export default class SelectSingle extends LitElement {
         <cs-listbox
           @cs-change=${this.handleListboxChange}
           .options=${options}
-          .value=${this.selectedOption}
         >
         </cs-listbox>
       </div>
